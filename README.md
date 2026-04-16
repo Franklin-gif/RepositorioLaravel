@@ -4,37 +4,70 @@
 **Materia:** Software VII  
 **Profesora:** Ing. Irina Fong  
 
-## 1. Descripción del Proyecto
-Este proyecto consiste en la instalación base de Laravel 9 utilizando un servidor local WAMP para la gestión de una base de datos MySQL, enfocado en cumplir con los requisitos de la materia Software VII.
+---
 
-## 2. Bitácora de Errores y Soluciones
+## 📝 Descripción del Proyecto
+Este proyecto consiste en la instalación base de **Laravel 9** utilizando un servidor local **WAMP** para la gestión de una base de datos MySQL, enfocado en cumplir con los requisitos académicos de la materia Software VII.
 
-Durante el proceso de instalación se presentaron diversos inconvenientes técnicos que fueron resueltos de la siguiente manera:
+---
 
-### A. Restricciones de Seguridad en Composer (PKSA)
-**Error:** Al ejecutar `composer update`, el sistema bloqueaba la descarga debido a "security advisories" (avisos de seguridad) en la versión de Laravel 9.
-**Solución:** Se utilizó el comando `composer update --no-audit` para omitir la auditoría de seguridad en el entorno de desarrollo local, permitiendo la instalación de las dependencias necesarias.
+## 🛠️ Bitácora de Errores y Soluciones
 
-### B. Conflicto de Acceso a MySQL (Error 1045)
-**Error:** phpMyAdmin y Laravel rechazaban la conexión con el mensaje `Access denied for user 'root'@'localhost'`.
-**Solución:** Se identificó que el archivo `.env` tenía configurada una contraseña por defecto (`demo`), mientras que el servidor WAMP estaba configurado sin contraseña. Se procedió a limpiar el campo `DB_PASSWORD=` en el archivo de configuración.
+> [!IMPORTANT]
+> Los siguientes puntos detallan los obstáculos técnicos encontrados y cómo se superaron para lograr un entorno estable.
 
-### C. Clase "Schema" no encontrada
-**Error:** Al intentar realizar las migraciones (`php artisan migrate`), el sistema devolvía un error indicando que la clase `Schema` no existía en el contexto de `AppServiceProvider`.
-**Solución:** Se añadió manualmente la fachada de soporte en la cabecera del archivo `AppServiceProvider.php`:
-`use Illuminate\Support\Facades\Schema;` 
-Y se definió `Schema::defaultStringLength(191);` para evitar errores de longitud de llave en versiones antiguas de MySQL.
+### 1. Restricciones de Seguridad en Composer (PKSA)
+**Error:** Al ejecutar `composer update`, el sistema bloqueaba la descarga debido a avisos de seguridad en Laravel 9.
 
-### D. Ejecución de Activos (Vite)
-**Error:** El comando `npm run dev` fallaba porque las dependencias de Node.js no estaban instaladas.
-**Solución:** Se ejecutó `npm install` para descargar los módulos de Node y posteriormente se levantó el servidor de activos con `npm run dev`.
+> [!CAUTION]
+> **Mensaje de error:** `Your requirements could not be resolved to an installable set of packages... affected by security advisories`.
 
-## 3. Comandos Principales Utilizados
-- **Instalación de dependencias:** `composer update --no-audit`
-- **Generación de llave de seguridad:** `php artisan key:generate`
-- **Ejecución de migraciones:** `php artisan migrate`
-- **Servidor de desarrollo:** `php artisan serve`
-- **Compilación de frontend:** `npm run dev`
+* **Solución:** Se utilizó el comando `composer update --no-audit` para omitir la auditoría de seguridad en el entorno de desarrollo local.
 
-## 4. Resultado Final
-Se logró establecer la conexión exitosa con la base de datos `laravel` en phpMyAdmin, la creación de las tablas de sistema (`users`, `migrations`, `password_resets`) y la visualización de la pantalla de bienvenida de la aplicación.
+### 2. Conflicto de Acceso a MySQL (Error 1045)
+**Error:** phpMyAdmin y Laravel rechazaban la conexión del usuario root.
+
+> [!WARNING]
+> **Causa:** El archivo `.env` tenía una contraseña (`demo`) que no existía en el servidor local WAMP.
+
+* **Solución:** Se editó el archivo `.env` dejando el campo vacío: `DB_PASSWORD=`.
+
+### 3. Clase "Schema" no encontrada
+**Error:** Fallo al ejecutar las migraciones iniciales.
+
+> [!TIP]
+> **Mejor práctica:** Para asegurar compatibilidad con versiones antiguas de MySQL, siempre es recomendable definir una longitud de cadena por defecto.
+
+* **Solución:** Se añadió la importación en `AppServiceProvider.php`:
+    ```php
+    use Illuminate\Support\Facades\Schema;
+    
+    public function boot() {
+        Schema::defaultStringLength(191);
+    }
+    ```
+
+### 4. Ejecución de Activos (Vite)
+**Error:** El comando `npm run dev` no era reconocido.
+
+> [!NOTE]
+> Esto sucede porque los módulos de Node no se descargan por defecto al clonar o crear un proyecto.
+
+* **Solución:** Ejecución de `npm install` seguido de `npm run dev`.
+
+---
+
+## 🚀 Comandos Principales
+A continuación, los comandos esenciales utilizados para estabilizar el proyecto:
+
+| Objetivo | Comando |
+| :--- | :--- |
+| Instalar dependencias | `composer update --no-audit` |
+| Generar llave | `php artisan key:generate` |
+| Ejecutar tablas | `php artisan migrate` |
+| Levantar servidor | `php artisan serve` |
+
+---
+
+## ✅ Resultado Final
+Se logró establecer la conexión exitosa con la base de datos en **phpMyAdmin**, verificando la creación de las tablas de sistema y el acceso al Dashboard de Laravel.
